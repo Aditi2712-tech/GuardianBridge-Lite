@@ -1,0 +1,23 @@
+import { BellRing, CheckCircle2, CircleAlert, Radio, ShieldAlert } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useDemo } from '@/context/DemoContext';
+import { getAlerts } from '@/data/mockData';
+import { ConsolePage } from '@/components/layout/ConsolePage';
+import { MetricTile } from '@/components/MetricTile';
+
+type Filter = 'ALL' | 'NORMAL' | 'WARNING' | 'CRITICAL';
+export function Alerts() {
+  const [filter, setFilter] = useState<Filter>('ALL');
+  const { scenario, isDemo } = useDemo();
+  const active = isDemo ? scenario : 'normal';
+  const events = useMemo(() => getAlerts(active), [active]);
+  const shown = filter === 'ALL' ? events : events.filter((item) => item.severity === filter);
+  const critical = events.filter((item) => item.severity === 'CRITICAL').length;
+  const warning = events.filter((item) => item.severity === 'WARNING').length;
+  return <ConsolePage eyebrow="OPERATIONS / EVENTS" title="Alert Center" subtitle="Review structural anomalies and communication events.">
+    <div className="grid gap-3 sm:grid-cols-3"><MetricTile label="ACTIVE ALERTS" value={`${critical + warning}`} detail={critical + warning ? 'REVIEW' : 'CLEAR'} tone={critical ? 'red' : warning ? 'amber' : 'green'} icon={<BellRing size={15} />} /><MetricTile label="WARNING" value={`${warning}`} detail="CURRENT WINDOW" tone="amber" icon={<CircleAlert size={15} />} /><MetricTile label="CRITICAL" value={`${critical}`} detail={critical ? 'IMMEDIATE REVIEW' : 'NONE'} tone="red" icon={<ShieldAlert size={15} />} /></div>
+    <section className="panel p-4"><div className="flex flex-wrap gap-1.5">{(['ALL', 'NORMAL', 'WARNING', 'CRITICAL'] as Filter[]).map((item) => <button key={item} onClick={() => setFilter(item)} data-testid={`button-alert-filter-${item.toLowerCase()}`} className={`border px-3 py-2 text-[10px] font-semibold tracking-[0.12em] transition-colors ${filter === item ? 'border-cyan-300/60 bg-cyan-300/10 text-cyan-200' : 'border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-200'}`}>{item}</button>)}</div></section>
+    <section className="panel overflow-hidden"><div className="flex items-center justify-between border-b border-slate-700/60 p-5"><div><div className="text-[11px] font-semibold tracking-[0.16em] text-slate-100">EVENT STREAM</div><div className="mono mt-1 text-[9px] text-slate-500">SIMULATED TELEMETRY · {shown.length} EVENTS</div></div><div className="flex items-center gap-2 text-[9px] text-emerald-300"><span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-emerald-300" />MONITORING</div></div><div className="divide-y divide-slate-700/50">{shown.map((item) => <div key={item.id} className="animate-rise-in flex flex-col gap-3 p-5 sm:flex-row sm:items-center" data-testid={`alert-row-${item.id}`}><div className={`flex h-8 w-8 shrink-0 items-center justify-center border ${item.severity === 'CRITICAL' ? 'border-rose-300/30 bg-rose-300/10 text-rose-300' : item.severity === 'WARNING' ? 'border-amber-300/30 bg-amber-300/10 text-amber-300' : 'border-emerald-300/30 bg-emerald-300/10 text-emerald-300'}`}>{item.severity === 'NORMAL' ? <CheckCircle2 size={15} /> : item.severity === 'CRITICAL' ? <ShieldAlert size={15} /> : <CircleAlert size={15} />}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="text-[12px] font-semibold text-slate-100">{item.title}</span><span className={`text-[8px] font-semibold tracking-[0.12em] ${item.severity === 'CRITICAL' ? 'text-rose-300' : item.severity === 'WARNING' ? 'text-amber-300' : 'text-emerald-300'}`}>{item.severity}</span></div><div className="mt-1 text-[10px] text-slate-500">{item.message}</div><div className="mono mt-2 flex flex-wrap gap-3 text-[9px] text-slate-600"><span>{item.bridgeId}</span>{item.nodeId && <span>{item.nodeId}</span>}<span>SCORE {item.anomalyScore?.toFixed(2) ?? '—'}</span></div></div><div className="flex shrink-0 items-center gap-5 sm:text-right"><div><div className="mono text-[10px] text-slate-300">{item.time}</div><div className="mono mt-1 text-[8px] text-slate-600">UTC</div></div><div className="hidden items-center gap-1.5 text-[9px] text-cyan-200 md:flex"><Radio size={12} />{item.loraStatus}</div></div></div>)}</div>{shown.length === 0 && <div className="p-10 text-center text-[11px] text-slate-500">No events match this filter in the current simulated window.</div>}</section>
+    <div className="flex items-center gap-2 text-[10px] text-slate-600"><Radio size={13} />Alert scores, timestamps, and transmission states are simulated demonstration data.</div>
+  </ConsolePage>;
+}

@@ -5,13 +5,14 @@ interface StatusCardProps {
   value: string;
   detail: string;
   icon: ReactNode;
-  tone: 'cyan' | 'green' | 'amber';
+  tone: 'cyan' | 'green' | 'amber' | 'red';
 }
 
 const toneClasses = {
   cyan: 'text-cyan-300 bg-cyan-300/10 border-cyan-300/20',
   green: 'text-emerald-300 bg-emerald-300/10 border-emerald-300/20',
   amber: 'text-amber-300 bg-amber-300/10 border-amber-300/20',
+  red: 'text-rose-300 bg-rose-300/10 border-rose-300/20',
 };
 
 export function StatusCard({ label, value, detail, icon, tone }: StatusCardProps) {

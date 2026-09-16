@@ -1,0 +1,823 @@
+Now continue the GuardianBridge Lite project and build ALL remaining pages and functionality.
+
+IMPORTANT:
+Do not redesign or replace the existing Dashboard.
+Keep the existing visual language, components, mock-data architecture, Demo Mode context, routing and sidebar.
+Extend the existing application cleanly.
+
+This is still FRONTEND ONLY.
+Do NOT create a backend, database, authentication, or real hardware integration.
+
+==================================================
+GLOBAL REQUIREMENTS
+==================================================
+
+Use the existing:
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Recharts
+- Lucide icons
+- centralized mock data
+- React context for Demo Mode
+
+All pages must share:
+- persistent sidebar
+- top header
+- consistent typography
+- consistent cards
+- consistent status colors
+- consistent spacing
+- responsive behavior
+
+Do not create separate mock values inside individual pages.
+
+All pages must react to the SAME Demo Mode scenario.
+
+Available scenarios:
+
+1. Normal Operation
+2. Increased Vibration
+3. Loose Joint
+4. Excess Load
+
+The scenario must affect the entire application consistently.
+
+==================================================
+1. BRIDGES PAGE
+==================================================
+
+Create /bridges.
+
+Title:
+Bridges
+
+Subtitle:
+Monitor the health and connectivity of your bridge infrastructure.
+
+Create bridge cards for:
+
+GB-01
+Status: HEALTHY
+Health: 94%
+Risk: LOW
+Nodes: 2/2
+
+GB-02
+Status: WARNING
+Health: 72%
+Risk: MEDIUM
+Nodes: 2/2
+
+Each bridge card should contain:
+- bridge ID
+- health percentage
+- status badge
+- risk level
+- node count
+- last update
+- miniature health visualization
+
+Make cards clickable.
+
+Clicking a bridge opens a detailed Bridge Details view.
+
+Bridge Details must contain:
+
+BRIDGE OVERVIEW
+- Bridge ID
+- Health
+- Risk
+- Status
+- Last update
+
+SENSOR NODES
+- GB-01-N01
+- GB-01-N02
+
+For each node:
+- status
+- battery
+- RSSI
+- vibration
+- tilt
+- last packet
+
+MONITORING SUMMARY
+- RMS
+- Peak-to-Peak
+- FFT Peak
+- Tilt deviation
+
+Create charts for:
+- vibration
+- health trend
+
+RECENT EVENTS
+
+Add a Back to Bridges control.
+
+==================================================
+2. LIVE MONITORING PAGE
+==================================================
+
+Create /live-monitoring.
+
+Title:
+Live Monitoring
+
+Subtitle:
+Real-time vibration and motion data from bridge sensor nodes.
+
+Top controls:
+
+Bridge:
+GB-01
+
+Node:
+GB-01-N01
+GB-01-N02
+
+Add a clearly visible:
+
+● LIVE
+
+indicator.
+
+Create six metric cards:
+
+ACCELERATION
+
+X
+0.42 g
+
+Y
+0.18 g
+
+Z
+0.97 g
+
+GYROSCOPE
+
+X
+0.03 °/s
+
+Y
+0.07 °/s
+
+Z
+0.02 °/s
+
+Create three large charts:
+
+1. ACCELERATION
+2. GYROSCOPE
+3. VIBRATION
+
+Use Recharts.
+
+Charts should look like continuously updating sensor streams.
+
+Show feature metrics:
+
+RMS
+0.31 g
+
+Peak-to-Peak
+0.72 g
+
+FFT Peak
+14.2 Hz
+
+Sampling Rate
+100 Hz
+
+When Demo Mode changes, update the charts and values.
+
+==================================================
+3. TINYML ANALYSIS PAGE
+==================================================
+
+Create /tinyml.
+
+This must be one of the strongest pages in the application.
+
+Title:
+TinyML Analysis
+
+Subtitle:
+Edge-based anomaly detection and structural vibration analysis.
+
+Create a large anomaly score section.
+
+Example normal state:
+
+NORMAL
+
+0.08
+
+Anomaly Score
+
+Create a visual score bar from:
+
+0.00 ───────────── 1.00
+
+Thresholds:
+
+0.00–0.39
+NORMAL
+
+0.40–0.69
+WARNING
+
+0.70–1.00
+CRITICAL
+
+Show a moving indicator representing the current anomaly score.
+
+Create a large section:
+
+FEATURE EXTRACTION
+
+Show:
+
+RMS
+0.31 g
+
+Peak-to-Peak
+0.72 g
+
+FFT Peak
+14.2 Hz
+
+Tilt Deviation
+0.8°
+
+Create:
+
+CURRENT VS HEALTHY BASELINE
+
+Table:
+
+Feature | Current | Healthy Baseline
+
+RMS | 0.31 g | 0.28 g
+Peak-to-Peak | 0.72 g | 0.65 g
+FFT Peak | 14.2 Hz | 13.8 Hz
+Tilt | 0.8° | 0.6°
+
+Create an anomaly timeline.
+
+Example:
+
+21:42 NORMAL
+21:45 NORMAL
+21:47 WARNING
+21:50 NORMAL
+21:54 NORMAL
+
+Also create an engineering pipeline:
+
+MPU6050
+↓
+Feature Extraction
+↓
+TinyML Inference
+↓
+Anomaly Score
+↓
+Risk Classification
+
+Make this visually excellent.
+
+==================================================
+4. ALERTS PAGE
+==================================================
+
+Create /alerts.
+
+Title:
+Alert Center
+
+Subtitle:
+Review structural anomalies and communication events.
+
+Create three summary cards:
+
+ACTIVE ALERTS
+0
+
+WARNING
+0
+
+CRITICAL
+0
+
+Create filter tabs:
+
+ALL
+NORMAL
+WARNING
+CRITICAL
+
+Create a professional alert list.
+
+Each alert should show:
+
+severity
+bridge ID
+node ID
+message
+anomaly score
+timestamp
+LoRa transmission status
+
+Example:
+
+CRITICAL
+GB-01
+GB-01-N02
+
+Abnormal vibration detected
+
+Anomaly Score
+0.92
+
+LoRa
+PACKET TRANSMITTED
+
+21:54:32
+
+Also include normal system events.
+
+When Demo Mode is Normal:
+show no critical alerts.
+
+When Increased Vibration:
+create a warning alert.
+
+When Loose Joint:
+create a WARNING alert with:
+Health 67%
+Anomaly Score 0.73
+LoRa PACKET TRANSMITTED
+
+When Excess Load:
+create an appropriate elevated alert.
+
+Make alerts visually prominent but professional.
+
+==================================================
+5. LORA NETWORK PAGE
+==================================================
+
+Create /lora.
+
+Title:
+LoRa Network
+
+Subtitle:
+Monitor long-range communication between sensor nodes and gateway.
+
+Create a large communication diagram:
+
+SENSOR NODE
+GB-01-N01
+● ONLINE
+
+↓
+
+LoRa
+433 MHz
+
+↓
+
+GATEWAY
+GB-GW-01
+● ONLINE
+
+↓
+
+MONITORING DASHBOARD
+
+Make this diagram visually impressive.
+
+Add an animated packet moving along the connection.
+
+Create network metric cards:
+
+NODES ONLINE
+2 / 2
+
+PACKETS SENT
+1,248
+
+PACKETS RECEIVED
+1,239
+
+PACKET LOSS
+0.72%
+
+RSSI
+-72 dBm
+
+LAST PACKET
+2 sec ago
+
+GATEWAY
+CONNECTED
+
+Create a node table:
+
+Node ID | Status | RSSI | Battery | Last Packet
+
+GB-01-N01
+ONLINE
+-72 dBm
+87%
+2 sec ago
+
+GB-01-N02
+ONLINE
+-75 dBm
+81%
+3 sec ago
+
+Clearly label values as DEMO DATA.
+
+==================================================
+6. SYSTEM PAGE
+==================================================
+
+Create /system.
+
+Title:
+System
+
+Subtitle:
+GuardianBridge Lite system status and connected components.
+
+Create:
+
+SYSTEM STATUS
+● SYSTEM ONLINE
+
+CONNECTED HARDWARE
+
+ESP32
+CONNECTED
+
+MPU6050
+CONNECTED
+
+LoRa Node
+CONNECTED
+
+LoRa Gateway
+CONNECTED
+
+Create a software pipeline:
+
+Sensor Acquisition
+↓
+Feature Extraction
+↓
+TinyML Inference
+↓
+LoRa Communication
+↓
+Gateway
+↓
+Monitoring Dashboard
+
+Create system configuration cards:
+
+Sampling Rate
+100 Hz
+
+Communication
+LoRa 433 MHz
+
+Sensor
+MPU6050
+
+Microcontroller
+ESP32
+
+ML
+TinyML
+
+Create a project architecture visualization.
+
+==================================================
+7. GLOBAL DEMO MODE
+==================================================
+
+This is extremely important.
+
+The existing Dashboard Demo Mode must control EVERY page.
+
+Do not create separate scenario states.
+
+Use the existing shared context.
+
+NORMAL OPERATION:
+
+Health:
+94%
+
+Anomaly:
+0.08
+
+Risk:
+LOW
+
+TinyML:
+NORMAL
+
+LoRa:
+CONNECTED
+
+All nodes:
+GREEN
+
+INCREASED VIBRATION:
+
+Health:
+approximately 78%
+
+Anomaly:
+approximately 0.55
+
+Risk:
+WARNING
+
+TinyML:
+ANOMALY DETECTED
+
+Vibration:
+clearly elevated
+
+LOOSE JOINT:
+
+Health:
+67%
+
+Anomaly:
+0.73
+
+Risk:
+WARNING
+
+TinyML:
+ANOMALY DETECTED
+
+LoRa:
+PACKET TRANSMITTED
+
+At least one node:
+AMBER
+
+Create a corresponding alert.
+
+EXCESS LOAD:
+
+Health:
+approximately 42–55%
+
+Anomaly:
+approximately 0.85–0.92
+
+Risk:
+CRITICAL
+
+TinyML:
+CRITICAL ANOMALY
+
+At least one node:
+RED
+
+Create a critical alert.
+
+Do not claim these are real measurements.
+They are demonstration scenarios.
+
+==================================================
+8. RESET SYSTEM
+==================================================
+
+Create a prominent RESET SYSTEM action.
+
+When clicked:
+
+- scenario returns to Normal Operation
+- health returns to 94%
+- anomaly returns to 0.08
+- nodes return to green
+- alerts return to normal state
+- charts return to normal waveform
+- TinyML returns to NORMAL
+- LoRa returns to CONNECTED
+
+Use a confirmation interaction if appropriate.
+
+==================================================
+9. NAVIGATION
+==================================================
+
+Make sure every sidebar link works:
+
+/                  Dashboard
+/bridges            Bridges
+/live-monitoring    Live Monitoring
+/tinyml             TinyML Analysis
+/alerts             Alerts
+/lora               LoRa Network
+/system             System
+
+No dead links.
+
+Active sidebar state must update based on current route.
+
+Browser refresh must preserve routing correctly.
+
+==================================================
+10. RESPONSIVE DESIGN
+==================================================
+
+Desktop:
+- persistent sidebar
+- multi-column dashboard
+- large charts
+
+Tablet:
+- responsive grid
+- compact sidebar
+
+Mobile:
+- slide-in navigation drawer
+- cards stack vertically
+- charts remain readable
+- tables become horizontally scrollable or card-based
+- bridge visualization scales correctly
+
+Do not allow horizontal page overflow.
+
+==================================================
+11. POLISH
+==================================================
+
+Add professional micro-interactions:
+
+- subtle card hover
+- live pulse indicators
+- smooth scenario transitions
+- chart animation
+- node status pulse
+- LoRa packet animation
+- alert appearance animation
+- modal transitions
+- page transitions where appropriate
+
+Do NOT over-animate.
+
+Add:
+- tooltips
+- loading states where useful
+- empty states
+- hover states
+- accessible labels
+
+==================================================
+12. ENGINEERING CREDIBILITY
+==================================================
+
+Do not add irrelevant smart-city features.
+
+The interface must remain focused on:
+
+MPU6050
+ESP32
+Vibration
+Tilt
+RMS
+Peak-to-Peak
+FFT
+TinyML
+Anomaly Score
+Risk Classification
+LoRa
+Gateway
+Bridge Health
+
+The frontend should clearly communicate this pipeline:
+
+SENSING
+→ FEATURE EXTRACTION
+→ TINYML
+→ LORA
+→ GATEWAY
+→ DASHBOARD
+
+==================================================
+13. CODE ARCHITECTURE
+==================================================
+
+Keep the existing architecture clean.
+
+Use reusable components instead of duplicating UI.
+
+Suggested structure:
+
+src/
+  components/
+    layout/
+    dashboard/
+    bridges/
+    monitoring/
+    tinyml/
+    alerts/
+    lora/
+    system/
+
+  context/
+  data/
+  types/
+  routes/
+  styles/
+
+Keep mock data centralized.
+
+Do not hardcode scenario-specific values inside individual pages.
+
+All pages should consume shared state/data.
+
+Create reusable components where appropriate:
+- StatusCard
+- MetricCard
+- StatusBadge
+- SensorChart
+- BridgeVisualization
+- SensorNode
+- AlertCard
+- Pipeline
+- DemoControls
+- PageHeader
+- DataTable
+- NetworkNode
+
+==================================================
+14. BACKEND READINESS
+==================================================
+
+Do not implement a backend.
+
+However, keep data access separated from presentation.
+
+The mock data layer should later be replaceable by:
+
+REST API
+or
+WebSocket
+
+without redesigning the UI.
+
+Do not make UI components responsible for API calls.
+
+==================================================
+15. FINAL TEST
+==================================================
+
+Before finishing:
+
+Test every route.
+
+Test sidebar navigation.
+
+Test Bridge Details.
+
+Test sensor-node modal.
+
+Test Demo Mode.
+
+Test all four scenarios.
+
+Test Reset System.
+
+Test chart updates.
+
+Test alert generation.
+
+Test responsive layout.
+
+Fix all console errors.
+
+Fix all TypeScript errors.
+
+Fix broken imports.
+
+Make sure the application runs successfully.
+
+Do not stop after creating placeholders.
+Every page listed above must be fully implemented and visually polished.

@@ -26,8 +26,9 @@ export interface SensorReading {
 }
 
 export interface TinyMLResult {
-  status: 'NORMAL' | 'WARNING' | 'ANOMALY';
+  status: 'NORMAL' | 'WARNING' | 'ANOMALY' | 'CRITICAL ANOMALY';
   anomalyScore: number;
+  risk: 'LOW' | 'WARNING' | 'CRITICAL';
 }
 
 export interface Alert {
@@ -36,6 +37,10 @@ export interface Alert {
   bridgeId: string;
   severity: 'NORMAL' | 'WARNING' | 'CRITICAL';
   time: string;
+  nodeId?: string;
+  message?: string;
+  anomalyScore?: number;
+  loraStatus?: 'PACKET TRANSMITTED' | 'CONNECTED' | 'STANDBY';
 }
 
 export interface LoRaStatus {

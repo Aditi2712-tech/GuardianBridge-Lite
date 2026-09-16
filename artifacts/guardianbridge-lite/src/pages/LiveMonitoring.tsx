@@ -1,0 +1,20 @@
+import { Activity, Gauge, Move3d, Waves } from 'lucide-react';
+import { useState } from 'react';
+import { useDemo } from '@/context/DemoContext';
+import { getScenarioStats } from '@/data/mockData';
+import { ConsolePage } from '@/components/layout/ConsolePage';
+import { MetricTile } from '@/components/MetricTile';
+import { TelemetryChart } from '@/components/TelemetryCharts';
+
+export function LiveMonitoring() {
+  const [node, setNode] = useState('GB-01-N01');
+  const { scenario, isDemo } = useDemo();
+  const stats = getScenarioStats(isDemo ? scenario : 'normal');
+  const axis = [['ACCEL X', `${stats.nodeVibration.toFixed(2)} g`], ['ACCEL Y', `${(stats.nodeVibration * .62).toFixed(2)} g`], ['ACCEL Z', `${(stats.nodeVibration * .84).toFixed(2)} g`], ['GYRO X', '1.82 °/s'], ['GYRO Y', '0.94 °/s'], ['GYRO Z', '2.14 °/s']];
+  return <ConsolePage eyebrow="OPERATIONS / TELEMETRY / LIVE" title="Live Monitoring" subtitle="Inspect real-time acceleration, gyroscope, and vibration signals from the selected field node.">
+    <section className="panel p-4"><div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"><div className="flex items-center gap-3"><span className="relative flex h-3 w-3"><span className="absolute h-full w-full animate-pulse-dot rounded-full bg-rose-400" /><span className="relative h-2.5 w-2.5 rounded-full bg-rose-300" /></span><div><div className="text-[12px] font-semibold tracking-[0.12em] text-slate-100">LIVE TELEMETRY</div><div className="mono mt-1 text-[9px] text-slate-500">SIMULATED STREAM · UPDATES CONTINUOUSLY</div></div></div><div className="flex flex-col gap-2 sm:flex-row"><label className="flex items-center gap-2 text-[10px] text-slate-500">BRIDGE<select aria-label="Select bridge" data-testid="select-monitor-bridge" className="border border-slate-700 bg-[#111f2d] px-3 py-2 text-[11px] text-slate-200 outline-none"><option>GB-01 · North Channel</option></select></label><label className="flex items-center gap-2 text-[10px] text-slate-500">NODE<select value={node} onChange={(event) => setNode(event.target.value)} aria-label="Select sensor node" data-testid="select-monitor-node" className="border border-slate-700 bg-[#111f2d] px-3 py-2 text-[11px] text-slate-200 outline-none"><option>GB-01-N01</option><option>GB-01-N02</option></select></label></div></div></section>
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">{axis.map(([label, value], index) => <MetricTile key={label} label={label} value={value} detail={index < 3 ? 'ACCELERATION' : 'GYROSCOPE'} icon={index < 3 ? <Waves size={14} /> : <Move3d size={14} />} />)}</div>
+    <div className="grid gap-5 xl:grid-cols-3"><TelemetryChart kind="acceleration" title="ACCELERATION" subtitle={`${node} · X/Y/Z composite · SIMULATED`} /><TelemetryChart kind="gyroscope" title="GYROSCOPE" subtitle={`${node} · angular velocity · SIMULATED`} /><TelemetryChart kind="vibration" title="VIBRATION" subtitle={`${node} · waveform envelope · SIMULATED`} /></div>
+    <section className="panel p-5"><div className="flex items-center justify-between"><div><div className="text-[11px] font-semibold tracking-[0.16em] text-slate-100">FEATURE METRICS</div><div className="mono mt-1 text-[9px] text-slate-500">WINDOW 256 SAMPLES / MPU6050</div></div><Gauge size={17} className="text-cyan-300" /></div><div className="mt-5 grid grid-cols-2 gap-px border border-slate-700/70 bg-slate-700/70 sm:grid-cols-4">{[['RMS', stats.rms], ['PEAK-TO-PEAK', stats.peak], ['FFT PEAK', stats.fft], ['SAMPLING RATE', stats.sampling]].map(([label, value]) => <div key={label} className="bg-[#152638] p-4"><div className="mono text-[8px] tracking-[0.12em] text-slate-500">{label}</div><div className="mono mt-2 text-[15px] text-slate-100">{value}</div></div>)}</div><div className="mt-4 flex items-center gap-2 text-[10px] text-cyan-200"><Activity size={13} />{isDemo ? 'DEMO STREAM ACTIVE' : 'FIELD STREAM READ ONLY'} · node {node}</div></section>
+  </ConsolePage>;
+}

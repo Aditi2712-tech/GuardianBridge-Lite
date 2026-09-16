@@ -1,11 +1,20 @@
 import { Bell, Menu, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
+import { useLocation } from 'wouter';
+import { useDemo } from '@/context/DemoContext';
+import { getAlerts } from '@/data/mockData';
 
 interface HeaderProps {
   onMenu: () => void;
 }
 
 export function Header({ onMenu }: HeaderProps) {
+  const [location] = useLocation();
+  const { resetSystem, scenario, isDemo } = useDemo();
+  const activeScenario = isDemo ? scenario : 'normal';
+  const activeAlerts = getAlerts(activeScenario).filter((item) => item.severity !== 'NORMAL').length;
+  const title = location === '/' ? 'Dashboard' : location.startsWith('/bridges') ? 'Bridges' : location === '/live-monitoring' ? 'Live Monitoring' : location === '/tinyml' ? 'TinyML Analysis' : location === '/alerts' ? 'Alert Center' : location === '/lora' ? 'LoRa Network' : 'System';
+  const subtitle = location === '/' ? 'Real-time overview of your bridge monitoring network' : 'GuardianBridge Lite engineering console';
   const [noticeOpen, setNoticeOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   return (
@@ -15,8 +24,8 @@ export function Header({ onMenu }: HeaderProps) {
           <Menu size={18} />
         </button>
         <div>
-          <h1 className="text-[17px] font-semibold tracking-tight text-slate-100 md:text-[19px]">Dashboard</h1>
-          <p className="mt-0.5 text-[11px] text-slate-500 md:text-xs">Real-time overview of your bridge monitoring network</p>
+           <h1 className="text-[17px] font-semibold tracking-tight text-slate-100 md:text-[19px]">{title}</h1>
+           <p className="mt-0.5 text-[11px] text-slate-500 md:text-xs">{subtitle}</p>
         </div>
       </div>
       <div className="flex items-center gap-3 md:gap-5">
@@ -31,7 +40,7 @@ export function Header({ onMenu }: HeaderProps) {
         <div className="relative">
           <button aria-label="Notifications" data-testid="button-notifications" onClick={() => { setNoticeOpen((open) => !open); setProfileOpen(false); }} className={`relative rounded border p-2 transition-colors ${noticeOpen ? 'border-cyan-300/50 bg-cyan-300/10 text-cyan-200' : 'border-transparent text-slate-400 hover:border-slate-600 hover:text-slate-200'}`}>
             <Bell size={17} />
-            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-cyan-300" />
+            {activeAlerts > 0 && <span className={`absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full ${activeAlerts > 1 ? 'bg-rose-300' : 'bg-amber-300'}`} />}
           </button>
           {noticeOpen && (
             <div className="panel absolute right-0 top-11 z-30 w-64 p-3">
@@ -39,10 +48,11 @@ export function Header({ onMenu }: HeaderProps) {
                 <span className="text-[11px] font-semibold text-slate-200">Notifications</span>
                 <button aria-label="Close notifications" data-testid="button-close-notifications" onClick={() => setNoticeOpen(false)} className="text-slate-500 hover:text-slate-200"><X size={13} /></button>
               </div>
-              <p className="mt-3 text-[11px] leading-relaxed text-slate-400">No new critical anomalies. The telemetry fabric is operating within expected parameters.</p>
+              <p className="mt-3 text-[11px] leading-relaxed text-slate-400">{activeAlerts ? `${activeAlerts} simulated alert${activeAlerts === 1 ? '' : 's'} require${activeAlerts === 1 ? 's' : ''} operator review in the current scenario.` : 'No new critical anomalies. The telemetry fabric is operating within expected parameters.'}</p>
             </div>
           )}
         </div>
+        <button data-testid="button-reset-system-header" onClick={() => { if (window.confirm('Reset the simulated system to Normal Operation?')) resetSystem(); }} className="hidden border border-amber-300/25 bg-amber-300/[0.05] px-2.5 py-2 text-[9px] font-semibold tracking-[0.12em] text-amber-200 transition-colors hover:border-amber-300/60 hover:bg-amber-300/10 sm:block">RESET SYSTEM</button>
         <div className="relative">
           <button aria-label="Open profile" data-testid="button-profile" onClick={() => { setProfileOpen((open) => !open); setNoticeOpen(false); }} className="flex items-center gap-2 rounded border border-slate-700/80 bg-slate-800/40 px-2 py-1.5 text-slate-300 hover:border-cyan-300/40">
             <span className="flex h-6 w-6 items-center justify-center bg-slate-700 text-[10px] font-semibold text-cyan-200">MT</span>

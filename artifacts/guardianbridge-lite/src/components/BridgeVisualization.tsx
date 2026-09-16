@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { BatteryMedium, CircleX, Radio, RotateCcw, Waves } from 'lucide-react';
-import { sensorNodes } from '@/data/mockData';
 import { useDemo } from '@/context/DemoContext';
-import { getScenarioStats } from '@/data/mockData';
+import { getScenarioNodes, getScenarioStats } from '@/data/mockData';
 import type { SensorNode } from '@/types';
 
 export function BridgeVisualization() {
   const [selectedNode, setSelectedNode] = useState<SensorNode | null>(null);
   const { scenario, isDemo } = useDemo();
   const stats = getScenarioStats(isDemo ? scenario : 'normal');
+  const nodes = getScenarioNodes(isDemo ? scenario : 'normal');
+  const nodesOnline = nodes.filter((node) => node.status === 'online').length;
   return (
     <section className="panel min-w-0 p-5" data-testid="card-bridge-visualization">
       <div className="flex items-start justify-between">
@@ -16,7 +17,7 @@ export function BridgeVisualization() {
           <div className="text-[11px] font-semibold tracking-[0.16em] text-slate-100">BRIDGE STRUCTURE</div>
           <div className="mono mt-1 text-[9px] text-slate-500">GB-01 <span className="text-slate-700">•</span> NORTH CHANNEL BRIDGE</div>
         </div>
-        <span className="border border-emerald-300/20 bg-emerald-300/[0.06] px-2 py-1 text-[9px] font-medium text-emerald-300">2 NODES ONLINE</span>
+        <span className={`border px-2 py-1 text-[9px] font-medium ${nodesOnline === nodes.length ? 'border-emerald-300/20 bg-emerald-300/[0.06] text-emerald-300' : 'border-amber-300/20 bg-amber-300/[0.06] text-amber-300'}`}>{nodesOnline} / {nodes.length} NODES ONLINE</span>
       </div>
       <div className="technical-grid relative mt-4 overflow-hidden border border-slate-700/50 bg-[#0d1927] px-2 py-3">
         <svg viewBox="0 0 540 260" className="h-[230px] w-full" role="img" aria-label="Stylized North Channel Bridge with two clickable sensor nodes">
@@ -39,15 +40,15 @@ export function BridgeVisualization() {
           <path d="M73 160 V179 M467 160 V179" stroke="#71909a" strokeWidth="5" />
           <path d="M270 159 V182" stroke="#71909a" strokeWidth="4" />
           <g fill="#78919a" opacity=".65"><circle cx="73" cy="160" r="3" /><circle cx="270" cy="160" r="3" /><circle cx="467" cy="160" r="3" /></g>
-          {sensorNodes.map((node) => {
+           {nodes.map((node) => {
             const x = node.position.x * 5.4;
             const y = 164;
             return (
               <g key={node.id} onClick={() => setSelectedNode(node)} onKeyDown={(event) => event.key === 'Enter' && setSelectedNode(node)} tabIndex={0} role="button" aria-label={`Open ${node.id} sensor details`} data-testid={`sensor-node-${node.id}`} className="cursor-pointer outline-none">
-                <circle cx={x} cy={y} r="15" fill="#59e1a3" opacity=".08" />
-                <circle cx={x} cy={y} r="7" fill="#123029" stroke="#59e1a3" strokeWidth="2" />
-                <circle cx={x} cy={y} r="3" fill="#70f1ae" />
-                <text x={x} y={y - 23} textAnchor="middle" fill="#8decb7" fontSize="9" fontFamily="IBM Plex Mono">{node.id}</text>
+                 <circle cx={x} cy={y} r="15" fill={node.status === 'warning' ? '#f4b74a' : node.status === 'offline' ? '#f06b7b' : '#59e1a3'} opacity=".08" />
+                 <circle cx={x} cy={y} r="7" fill={node.status === 'warning' ? '#3d3019' : node.status === 'offline' ? '#3d1e26' : '#123029'} stroke={node.status === 'warning' ? '#f4b74a' : node.status === 'offline' ? '#f06b7b' : '#59e1a3'} strokeWidth="2" />
+                 <circle cx={x} cy={y} r="3" fill={node.status === 'warning' ? '#ffd276' : node.status === 'offline' ? '#ff8794' : '#70f1ae'} />
+                 <text x={x} y={y - 23} textAnchor="middle" fill={node.status === 'warning' ? '#ffd276' : node.status === 'offline' ? '#ff8794' : '#8decb7'} fontSize="9" fontFamily="IBM Plex Mono">{node.id}</text>
               </g>
             );
           })}
@@ -63,7 +64,7 @@ export function BridgeVisualization() {
               <div><div className="mono text-[10px] tracking-[0.16em] text-cyan-300">SENSOR TELEMETRY</div><h2 className="mt-1 text-lg font-semibold text-slate-100">{selectedNode.id}</h2></div>
               <button aria-label="Close sensor details" data-testid="button-close-sensor-modal" onClick={() => setSelectedNode(null)} className="text-slate-500 hover:text-slate-200"><CircleX size={20} /></button>
             </div>
-            <div className="mt-4 flex items-center gap-2 border border-emerald-300/20 bg-emerald-300/[0.06] px-3 py-2 text-[11px] text-emerald-300"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />ONLINE <span className="ml-auto mono text-[9px] text-slate-500">PACKET {selectedNode.lastPacket}</span></div>
+             <div className={`mt-4 flex items-center gap-2 border px-3 py-2 text-[11px] ${selectedNode.status === 'offline' ? 'border-rose-300/20 bg-rose-300/[0.06] text-rose-300' : selectedNode.status === 'warning' ? 'border-amber-300/20 bg-amber-300/[0.06] text-amber-300' : 'border-emerald-300/20 bg-emerald-300/[0.06] text-emerald-300'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedNode.status === 'offline' ? 'bg-rose-400' : selectedNode.status === 'warning' ? 'bg-amber-400' : 'bg-emerald-400'}`} />{selectedNode.status.toUpperCase()} <span className="ml-auto mono text-[9px] text-slate-500">PACKET {selectedNode.lastPacket}</span></div>
             <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden border border-slate-700/70 bg-slate-700/70">
               {([
                 { label: 'Battery', value: `${selectedNode.battery}%`, icon: BatteryMedium },

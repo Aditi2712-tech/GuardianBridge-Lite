@@ -7,6 +7,13 @@ import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { DemoProvider } from '@/context/DemoContext';
 import { Dashboard } from '@/pages/Dashboard';
+import { Bridges } from '@/pages/Bridges';
+import { BridgeDetails } from '@/pages/BridgeDetails';
+import { LiveMonitoring } from '@/pages/LiveMonitoring';
+import { TinyML } from '@/pages/TinyML';
+import { Alerts } from '@/pages/Alerts';
+import { LoRa } from '@/pages/LoRa';
+import { System } from '@/pages/System';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
@@ -27,6 +34,13 @@ function Shell() {
         <RoutedErrorBoundary>
           <Switch>
             <Route path="/" component={Dashboard} />
+            <Route path="/bridges/:id" component={BridgeDetails} />
+            <Route path="/bridges" component={Bridges} />
+            <Route path="/live-monitoring" component={LiveMonitoring} />
+            <Route path="/tinyml" component={TinyML} />
+            <Route path="/alerts" component={Alerts} />
+            <Route path="/lora" component={LoRa} />
+            <Route path="/system" component={System} />
             <Route component={NotFound} />
           </Switch>
         </RoutedErrorBoundary>

@@ -1,9 +1,12 @@
 import { ArrowUpRight, CheckCircle2, CircleAlert } from 'lucide-react';
 import { useState } from 'react';
-import { alerts } from '@/data/mockData';
+import { getAlerts } from '@/data/mockData';
+import { useDemo } from '@/context/DemoContext';
 
 export function EventList() {
   const [expanded, setExpanded] = useState(false);
+  const { scenario, isDemo } = useDemo();
+  const alerts = getAlerts(isDemo ? scenario : 'normal');
   return (
     <section className="panel p-5" data-testid="card-recent-events">
       <div className="flex items-start justify-between">

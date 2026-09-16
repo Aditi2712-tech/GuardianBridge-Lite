@@ -105,7 +105,12 @@
 }
 .animate-rise-in { animation: rise-in .45s ease-out both; }
 .animate-pulse-dot { animation: pulse-dot 2.6s ease-in-out infinite; }
+.packet { animation: packet-travel 2.2s ease-in-out infinite; }
+@keyframes packet-travel {
+  0%, 100% { left: 8%; opacity: .35; transform: scale(.8); }
+  50% { left: 84%; opacity: 1; transform: scale(1.15); }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-rise-in, .animate-pulse-dot { animation: none; }
+  .animate-rise-in, .animate-pulse-dot, .packet { animation: none; }
 }

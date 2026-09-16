@@ -6,6 +6,7 @@ interface DemoContextValue {
   scenario: DemoScenario;
   setIsDemo: (value: boolean) => void;
   setScenario: (value: DemoScenario) => void;
+  resetSystem: () => void;
 }
 
 const DemoContext = createContext<DemoContextValue | null>(null);
@@ -13,7 +14,11 @@ const DemoContext = createContext<DemoContextValue | null>(null);
 export function DemoProvider({ children }: { children: ReactNode }) {
   const [isDemo, setIsDemo] = useState(true);
   const [scenario, setScenario] = useState<DemoScenario>('normal');
-  const value = useMemo(() => ({ isDemo, scenario, setIsDemo, setScenario }), [isDemo, scenario]);
+  const resetSystem = () => {
+    setIsDemo(true);
+    setScenario('normal');
+  };
+  const value = useMemo(() => ({ isDemo, scenario, setIsDemo, setScenario, resetSystem }), [isDemo, scenario]);
   return <DemoContext.Provider value={value}>{children}</DemoContext.Provider>;
 }
 

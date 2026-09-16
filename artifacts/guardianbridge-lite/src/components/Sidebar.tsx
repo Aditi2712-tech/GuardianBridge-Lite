@@ -1,4 +1,5 @@
-import { Activity, BellRing, Cable, ChevronRight, CircleDot, LayoutDashboard, Radio, ScanLine, X } from 'lucide-react';
+import { Activity, BellRing, Cable, ChevronRight, CircleDot, LayoutDashboard, Radio, ScanLine, Settings2, X } from 'lucide-react';
+import { Link, useLocation } from 'wouter';
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -6,15 +7,16 @@ interface SidebarProps {
 }
 
 const primaryNav = [
-  { label: 'Dashboard', icon: LayoutDashboard, active: true },
-  { label: 'Bridges', icon: Cable, active: false },
-  { label: 'Live Monitoring', icon: Activity, active: false },
-  { label: 'TinyML Analysis', icon: ScanLine, active: false },
-  { label: 'Alerts', icon: BellRing, active: false },
-  { label: 'LoRa Network', icon: Radio, active: false },
+  { label: 'Dashboard', icon: LayoutDashboard, href: '/' },
+  { label: 'Bridges', icon: Cable, href: '/bridges' },
+  { label: 'Live Monitoring', icon: Activity, href: '/live-monitoring' },
+  { label: 'TinyML Analysis', icon: ScanLine, href: '/tinyml' },
+  { label: 'Alerts', icon: BellRing, href: '/alerts' },
+  { label: 'LoRa Network', icon: Radio, href: '/lora' },
 ];
 
 export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
+  const [location] = useLocation();
   return (
     <>
       {mobileOpen && <button aria-label="Close navigation" data-testid="button-close-navigation" className="fixed inset-0 z-40 bg-slate-950/70 lg:hidden" onClick={onClose} />}
@@ -39,9 +41,11 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         </div>
 
         <nav className="mt-8 space-y-1" aria-label="Primary navigation">
-          {primaryNav.map(({ label, icon: Icon, active }) => (
-            <button
+          {primaryNav.map(({ label, icon: Icon, href }) => {
+            const active = href === '/' ? location === '/' : location.startsWith(href);
+            return <Link
               key={label}
+              href={href}
               data-testid={`nav-${label.toLowerCase().replaceAll(' ', '-')}`}
               onClick={onClose}
               className={`group flex w-full items-center gap-3 border-l-2 px-3 py-2.5 text-left text-[12px] font-medium tracking-wide transition-colors ${active ? 'border-cyan-300 bg-cyan-300/[0.08] text-cyan-200' : 'border-transparent text-slate-400 hover:border-slate-500 hover:bg-slate-800/45 hover:text-slate-200'}`}
@@ -49,8 +53,8 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               <Icon size={16} strokeWidth={active ? 2.2 : 1.7} />
               <span>{label}</span>
               {active && <ChevronRight size={14} className="ml-auto text-cyan-300/70" />}
-            </button>
-          ))}
+            </Link>;
+          })}
         </nav>
 
         <div className="mt-8 border-t border-slate-700/60 pt-5">
@@ -60,6 +64,11 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
             <span>Telemetry fabric</span>
             <span className="ml-auto mono text-[9px] text-emerald-400">OK</span>
           </div>
+          <Link href="/system" onClick={onClose} data-testid="nav-system" className={`mt-3 flex items-center gap-3 border-l-2 px-3 py-2.5 text-[12px] font-medium tracking-wide ${location.startsWith('/system') ? 'border-cyan-300 bg-cyan-300/[0.08] text-cyan-200' : 'border-transparent text-slate-400 hover:border-slate-500 hover:bg-slate-800/45 hover:text-slate-200'}`}>
+            <Settings2 size={16} />
+            <span>System</span>
+            {location.startsWith('/system') && <ChevronRight size={14} className="ml-auto text-cyan-300/70" />}
+          </Link>
         </div>
 
         <div className="mt-auto border-t border-slate-700/60 pt-4">
