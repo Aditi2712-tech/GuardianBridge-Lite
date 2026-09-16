@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --font-sans: var(--app-font-sans);
+  --font-mono: var(--app-font-mono);
+}
+
+:root {
+  --background: 216 39% 9%;
+  --foreground: 205 31% 91%;
+  --border: 214 28% 21%;
+  --input: 214 28% 21%;
+  --ring: 188 92% 54%;
+  --card: 215 35% 12%;
+  --card-foreground: 205 31% 91%;
+  --card-border: 214 29% 23%;
+  --primary: 188 92% 54%;
+  --primary-foreground: 216 39% 9%;
+  --secondary: 215 29% 18%;
+  --secondary-foreground: 206 20% 77%;
+  --muted: 215 27% 16%;
+  --muted-foreground: 214 17% 59%;
+  --accent: 201 91% 58%;
+  --accent-foreground: 216 39% 9%;
+  --app-font-sans: 'DM Sans', sans-serif;
+  --app-font-mono: 'IBM Plex Mono', monospace;
+  --radius: 0.4rem;
+}
+
+.dark {
+  --background: 216 39% 9%;
+  --foreground: 205 31% 91%;
+  --border: 214 28% 21%;
+  --input: 214 28% 21%;
+  --ring: 188 92% 54%;
+  --card: 215 35% 12%;
+  --card-foreground: 205 31% 91%;
+  --card-border: 214 29% 23%;
+  --primary: 188 92% 54%;
+  --primary-foreground: 216 39% 9%;
+  --secondary: 215 29% 18%;
+  --secondary-foreground: 206 20% 77%;
+  --muted: 215 27% 16%;
+  --muted-foreground: 214 17% 59%;
+  --accent: 201 91% 58%;
+  --accent-foreground: 216 39% 9%;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { background: hsl(var(--background)); }
+  body {
+    @apply font-sans antialiased;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    min-width: 320px;
+  }
+  button, a { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer utilities {
+  .technical-grid {
+    background-image:
+      linear-gradient(rgba(102, 151, 175, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(102, 151, 175, 0.045) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .mono { font-family: var(--app-font-mono); }
+  .hairline { border-color: rgba(133, 177, 195, 0.16); }
+  .panel {
+    background: linear-gradient(145deg, rgba(25, 43, 61, 0.96), rgba(16, 29, 43, 0.98));
+    border: 1px solid rgba(133, 177, 195, 0.17);
+    box-shadow: 0 12px 34px rgba(2, 12, 21, 0.16);
+  }
+  .panel-accent { box-shadow: inset 2px 0 0 hsl(var(--primary)), 0 12px 34px rgba(2, 12, 21, 0.16); }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: .5; transform: scale(.9); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.animate-rise-in { animation: rise-in .45s ease-out both; }
+.animate-pulse-dot { animation: pulse-dot 2.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in, .animate-pulse-dot { animation: none; }
+}

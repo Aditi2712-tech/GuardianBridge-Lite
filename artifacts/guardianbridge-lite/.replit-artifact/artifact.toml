@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "GuardianBridge Lite"
+description = "A professional TinyML bridge health monitoring dashboard for infrastructure teams to review vibration, sensor, network, and anomaly status in a live demo environment."
+version = "1.0.0"
+id = "artifacts/guardianbridge-lite"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22327
+
+[services.development]
+run = "pnpm --filter @workspace/guardianbridge-lite run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/guardianbridge-lite", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/guardianbridge-lite/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22327"
+BASE_PATH = "/"

@@ -1,0 +1,319 @@
+Build the frontend for a project called GuardianBridge Lite.
+
+GuardianBridge Lite is a TinyML-based smart bridge health monitoring system for continuous micro-fracture/anomaly detection and wireless risk alerting.
+
+IMPORTANT:
+This is FRONTEND ONLY for now.
+No backend.
+No database.
+No authentication.
+No real hardware connection.
+Use centralized realistic mock data.
+
+TECH STACK:
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Recharts
+- Lucide React icons
+
+Create a professional dark industrial monitoring dashboard.
+
+DESIGN:
+- Deep navy background
+- Slate-blue cards
+- Cyan/electric-blue accents
+- Light gray/white text
+- Thin borders
+- Subtle technical grid texture
+- Green = healthy
+- Amber = warning
+- Red = critical
+- Cyan = active/information
+- Restrained animations
+- Professional infrastructure/engineering aesthetic
+- NOT a generic SaaS dashboard
+
+Create the project structure so it can later connect to a separate backend without changing the UI.
+
+Create centralized mock data and TypeScript interfaces.
+
+The core data models should include:
+- Bridge
+- SensorNode
+- SensorReading
+- TinyMLResult
+- Alert
+- LoRaStatus
+
+Create a React context for a shared DEMO MODE state.
+
+For now, build ONLY the application shell and the Dashboard page.
+
+==================================================
+APPLICATION SHELL
+==================================================
+
+Create a persistent desktop sidebar.
+
+Brand:
+
+GUARDIANBRIDGE
+LITE
+
+SMART INFRASTRUCTURE MONITORING
+
+Navigation:
+
+Dashboard
+Bridges
+Live Monitoring
+TinyML Analysis
+Alerts
+LoRa Network
+
+divider
+
+System
+
+Bottom of sidebar:
+
+● SYSTEM ONLINE
+
+Active Dashboard item has a cyan highlight.
+
+On mobile, sidebar becomes a slide-in drawer.
+
+Create a reusable top header containing:
+- page title
+- subtitle
+- system online indicator
+- last sync time
+- notification icon
+- profile placeholder
+
+==================================================
+DASHBOARD
+==================================================
+
+Page title:
+
+Dashboard
+
+Subtitle:
+
+Real-time overview of your bridge monitoring network.
+
+Greeting:
+
+Good evening, Monitoring Team
+
+Add a LIVE / DEMO toggle.
+
+When DEMO mode is enabled, show:
+
+TEST SCENARIO
+
+Normal Operation
+Increased Vibration
+Loose Joint
+Excess Load
+
+For this first implementation, make the scenario state functional even though the other pages don't exist yet.
+
+==================================================
+STATUS CARDS
+==================================================
+
+Create four cards:
+
+BRIDGE HEALTH
+94%
+Healthy
+
+TINYML STATUS
+NORMAL
+Anomaly Score: 0.08
+
+LORA NETWORK
+CONNECTED
+2 / 2 Nodes
+RSSI: -72 dBm
+
+ACTIVE ALERTS
+0
+No critical anomalies
+
+==================================================
+LIVE VIBRATION
+==================================================
+
+Create a large Recharts line chart.
+
+Title:
+LIVE VIBRATION
+
+Subtitle:
+MPU6050 • GB-01
+
+Show a live-looking waveform.
+
+Below the chart:
+
+Sampling Rate
+100 Hz
+
+RMS
+0.31 g
+
+Peak-to-Peak
+0.72 g
+
+FFT Peak
+14.2 Hz
+
+The waveform must change when the demo scenario changes.
+
+Normal:
+stable low-amplitude waveform
+
+Increased Vibration:
+higher amplitude
+
+Loose Joint:
+irregular waveform
+
+Excess Load:
+altered waveform
+
+==================================================
+BRIDGE NETWORK
+==================================================
+
+Create a professional SVG/CSS bridge visualization.
+
+Do NOT use a random stock image.
+
+Show a stylized bridge with two sensor nodes.
+
+Example:
+
+GB-01-N01 ●
+GB-01-N02 ●
+
+Both should initially be green.
+
+Include:
+
+Nodes Online: 2 / 2
+Current Risk: LOW
+Last Update: 2 sec ago
+
+Make each sensor node clickable.
+
+Clicking a node should open a modal containing:
+
+Node ID
+Status
+Battery
+RSSI
+Vibration
+Tilt
+Last Packet
+
+==================================================
+RECENT EVENTS
+==================================================
+
+Create a Recent Events card.
+
+Use:
+
+System heartbeat
+GB-01
+21:52:14
+NORMAL
+
+Sensor packet received
+GB-01
+21:51:42
+NORMAL
+
+Vibration deviation
+GB-02
+21:47:08
+WARNING
+
+TinyML classification
+GB-02
+21:47:10
+NORMAL
+
+Use status badges.
+
+==================================================
+PIPELINE
+==================================================
+
+At the bottom create a compact engineering pipeline:
+
+SENSING
+MPU6050
+
+→
+
+FEATURE EXTRACTION
+RMS • Peak-to-Peak • FFT
+
+→
+
+TINYML
+Anomaly Score
+
+→
+
+LORA
+Emergency Packet
+
+→
+
+GATEWAY
+Monitoring
+
+Make this visually polished and easy to understand.
+
+==================================================
+CODE QUALITY
+==================================================
+
+Do not scatter hardcoded values throughout components.
+
+Create a clean structure such as:
+
+src/
+  components/
+  data/
+  types/
+  context/
+  routes/
+  styles/
+
+Keep mock data separate from UI components.
+
+Create reusable components for:
+- Sidebar
+- Header
+- StatusCard
+- SensorChart
+- BridgeVisualization
+- SensorNode
+- EventList
+- DemoControls
+- Pipeline
+
+Make the application runnable immediately.
+
+Do NOT build the other pages yet.
+
+Focus heavily on making the Dashboard visually polished, responsive and professional.
