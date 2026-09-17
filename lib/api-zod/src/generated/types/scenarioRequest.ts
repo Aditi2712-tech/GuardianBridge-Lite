@@ -5,7 +5,8 @@
  * GuardianBridge Lite telemetry and structural health monitoring API
  * OpenAPI spec version: 0.1.0
  */
+import type { Scenario } from './scenario';
 
-export interface HealthStatus {
-  status: string;
+export interface ScenarioRequest {
+  scenario: Scenario;
 }

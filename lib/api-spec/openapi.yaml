@@ -3,20 +3,27 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: GuardianBridge Lite telemetry and structural health monitoring API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: telemetry
+    description: Live sensor telemetry
+  - name: dashboard
+    description: Aggregated dashboard views
+  - name: simulation
+    description: Demo telemetry controls
+  - name: system
+    description: System controls
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +31,335 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /v1/telemetry/ingest:
+    post:
+      operationId: ingestTelemetry
+      tags: [telemetry]
+      summary: Ingest a telemetry frame from field hardware
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelemetryIngestRequest"
+      responses:
+        "201":
+          description: Telemetry accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelemetryRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /v1/dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get the current dashboard KPI summary
+      responses:
+        "200":
+          description: Current dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /v1/telemetry/live-vibration:
+    get:
+      operationId: getLiveVibration
+      tags: [telemetry]
+      summary: Get the latest vibration frame
+      responses:
+        "200":
+          description: Latest vibration measurements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LiveVibration"
+  /v1/events/recent:
+    get:
+      operationId: getRecentEvents
+      tags: [dashboard]
+      summary: Get recent system events
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          description: Recent events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecentEvent"
+  /v1/network/posture:
+    get:
+      operationId: getNetworkPosture
+      tags: [dashboard]
+      summary: Get current network health posture
+      responses:
+        "200":
+          description: Network posture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NetworkPosture"
+  /v1/simulation/scenario:
+    post:
+      operationId: setSimulationScenario
+      tags: [simulation]
+      summary: Change the active demo scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioRequest"
+      responses:
+        "200":
+          description: Scenario activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /v1/system/reset:
+    post:
+      operationId: resetSystem
+      tags: [system]
+      summary: Reset active anomalies and return to nominal operation
+      responses:
+        "200":
+          description: System reset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /v1/system/mode:
+    post:
+      operationId: setSystemMode
+      tags: [system]
+      summary: Switch between live hardware and demo simulation modes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModeRequest"
+      responses:
+        "200":
+          description: Mode changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
 components:
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
+      required: [status]
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+    Scenario:
+      type: string
+      enum:
+        - Normal Operation
+        - Increased Vibration
+        - Loose Joint
+        - Excess Load
+    TelemetryStatus:
+      type: string
+      enum: [NORMAL, WARNING, ANOMALY, CRITICAL]
+    EventSeverity:
+      type: string
+      enum: [NORMAL, WARNING, CRITICAL]
+    LoraStatus:
+      type: string
+      enum: [CONNECTED, DISCONNECTED, DEGRADED]
+    TelemetryIngestRequest:
+      type: object
+      properties:
+        node_id:
+          type: string
+          default: GS-01
+        bridge_id:
+          type: string
+          default: NORTH_CHANNEL_BRIDGE
+        sampling_rate:
+          type: integer
+          minimum: 1
+        rms_g:
+          type: number
+        peak_to_peak_g:
+          type: number
+        fft_peak_hz:
+          type: number
+        anomaly_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        status:
+          $ref: "#/components/schemas/TelemetryStatus"
+        rssi_dbm:
+          type: integer
+        waveform_samples:
+          type: array
+          items:
+            type: number
       required:
+        - sampling_rate
+        - rms_g
+        - peak_to_peak_g
+        - fft_peak_hz
+        - anomaly_score
         - status
-
+        - rssi_dbm
+        - waveform_samples
+    TelemetryRecord:
+      allOf:
+        - $ref: "#/components/schemas/TelemetryIngestRequest"
+        - type: object
+          properties:
+            id:
+              type: integer
+            node_id:
+              type: string
+            bridge_id:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+          required: [id, node_id, bridge_id, timestamp]
+    LiveVibration:
+      type: object
+      properties:
+        node_id:
+          type: string
+        sampling_rate:
+          type: integer
+        rms_g:
+          type: number
+        peak_to_peak_g:
+          type: number
+        fft_peak_hz:
+          type: number
+        waveform:
+          type: array
+          items:
+            type: number
+        anomaly_score:
+          type: number
+        status:
+          $ref: "#/components/schemas/TelemetryStatus"
+        timestamp:
+          type: string
+          format: date-time
+      required: [node_id, sampling_rate, rms_g, peak_to_peak_g, fft_peak_hz, waveform, anomaly_score, status, timestamp]
+    DashboardSummary:
+      type: object
+      properties:
+        bridge_health:
+          type: integer
+        tinyml_status:
+          $ref: "#/components/schemas/TelemetryStatus"
+        anomaly_score:
+          type: number
+        lora_network_status:
+          $ref: "#/components/schemas/LoraStatus"
+        active_nodes:
+          type: string
+        rssi_dbm:
+          type: integer
+        active_alerts_count:
+          type: integer
+        mode:
+          type: string
+          enum: [LIVE, DEMO]
+        scenario:
+          $ref: "#/components/schemas/Scenario"
+        last_updated:
+          type: string
+          format: date-time
+      required: [bridge_health, tinyml_status, anomaly_score, lora_network_status, active_nodes, rssi_dbm, active_alerts_count, mode, scenario, last_updated]
+    RecentEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        event_type:
+          type: string
+        node_id:
+          type: string
+        bridge_id:
+          type: string
+        severity:
+          $ref: "#/components/schemas/EventSeverity"
+        anomaly_score:
+          type: number
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+      required: [id, event_type, node_id, bridge_id, severity, timestamp]
+    NetworkPosture:
+      type: object
+      properties:
+        node_id:
+          type: string
+        lora_status:
+          $ref: "#/components/schemas/LoraStatus"
+        rssi_dbm:
+          type: integer
+        active_nodes_count:
+          type: integer
+        total_nodes_count:
+          type: integer
+        packet_delivery_pct:
+          type: number
+        gateway_latency_ms:
+          type: integer
+        bridge_health_pct:
+          type: integer
+        updated_at:
+          type: string
+          format: date-time
+      required: [node_id, lora_status, rssi_dbm, active_nodes_count, total_nodes_count, packet_delivery_pct, gateway_latency_ms, bridge_health_pct, updated_at]
+    ScenarioRequest:
+      type: object
+      properties:
+        scenario:
+          $ref: "#/components/schemas/Scenario"
+      required: [scenario]
+    ModeRequest:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum: [LIVE, DEMO]
+      required: [mode]

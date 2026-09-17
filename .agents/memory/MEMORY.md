@@ -1,0 +1,1 @@
+- [Artifact verification](artifact-verification.md) — preview workflows provide required PORT/BASE_PATH values; use typecheck for standalone validation and managed workflows for runtime/build checks.

@@ -1,0 +1,102 @@
+Act as a Senior Full-Stack Engineer. Build a backend service for the "GuardianBridge Lite" Structural Health Monitoring dashboard and wire it directly to the existing UI layout shown in the frontend.
+
+### 1. Key Operational Modes & Ingestion Strategy
+
+1. Real Hardware Mode (LIVE Mode):
+   - Provide an HTTP POST ingestion endpoint (`/api/v1/telemetry/ingest`) for an ESP32 or LoRa Receiver Gateway.
+   - Provide an optional WebSocket connection (`/ws/hardware`) for direct streaming from an ESP32 Wi-Fi gateway.
+   - When real telemetry arrives, update all dashboard widgets in real-time.
+
+2. Simulation / Demo Mode (DEMO Mode):
+   - Build an internal backend telemetry generator (`simulator.js` or `simulator.py`).
+   - Support test scenario switching triggered via UI buttons:
+     - "Normal Operation": Stable baseline vibration (RMS ~0.31g, Anomaly Score < 0.15, Health ~98%).
+     - "Increased Vibration": Dynamic load fluctuations (RMS ~0.85g, Anomaly Score ~0.45, Health ~85%).
+     - "Loose Joint": Frequency shifts in spectral components (FFT Peak shifts, Anomaly Score ~0.78, Health ~65%).
+     - "Excess Load": Heavy static deflection/vibration spike (RMS > 1.5g, Anomaly Score > 0.88, Health < 50%, triggers Critical Alert).
+
+### 2. Data Models & Database Schema (SQLite / PostgreSQL)
+
+1. Telemetry Log Table:
+   - id: Auto ID
+   - node_id: String (e.g., "GS-01", "GS-02")
+   - bridge_id: String (e.g., "NORTH_CHANNEL_BRIDGE")
+   - sampling_rate: Integer (e.g., 100 Hz)
+   - rms_g: Float (e.g., 0.31)
+   - peak_to_peak_g: Float (e.g., 0.72)
+   - fft_peak_hz: Float (e.g., 14.2)
+   - raw_waveform: JSON Array of recent time-series amplitudes (for graph plotting)
+   - anomaly_score: Float (0.00 to 1.00)
+   - status: Enum ("NORMAL", "WARNING", "ANOMALY", "CRITICAL")
+   - timestamp: DateTime
+
+2. Network & Health Posture Table:
+   - node_id: String
+   - lora_status: Enum ("CONNECTED", "DISCONNECTED", "DEGRADED")
+   - rssi_dbm: Integer (e.g., -72)
+   - active_nodes_count: Integer (e.g., 2)
+   - total_nodes_count: Integer (e.g., 2)
+   - packet_delivery_pct: Float (e.g., 98.7)
+   - gateway_latency_ms: Integer (e.g., 184)
+   - bridge_health_pct: Integer (e.g., 94)
+
+3. System Events & Alerts Table:
+   - id: Auto ID
+   - event_type: String ("System heartbeat", "Sensor packet received", "TinyML classification", "Alert Triggered")
+   - node_id: String
+   - severity: Enum ("NORMAL", "WARNING", "CRITICAL")
+   - timestamp: DateTime
+
+### 3. API Endpoints Required
+
+- POST /api/v1/telemetry/ingest
+  Receives real-time payloads from the physical ESP32 / LoRa Gateway:
+  {
+    "node_id": "GS-01",
+    "sampling_rate": 100,
+    "rms_g": 0.31,
+    "peak_to_peak_g": 0.72,
+    "fft_peak_hz": 14.2,
+    "anomaly_score": 0.08,
+    "status": "NORMAL",
+    "rssi_dbm": -72,
+    "waveform_samples": [0.1, 0.2, 0.3, 0.1, -0.2]
+  }
+
+- GET /api/v1/dashboard/summary
+  Returns aggregated KPI data matching the top cards:
+  - bridge_health: 94
+  - tinyml_status: "NORMAL"
+  - anomaly_score: 0.08
+  - lora_network_status: "CONNECTED"
+  - active_nodes: "2/2"
+  - rssi_dbm: -72
+  - active_alerts_count: 0
+
+- GET /api/v1/telemetry/live-vibration
+  Returns latest spectral measurements (`sampling_rate`, `rms_g`, `peak_to_peak_g`, `fft_peak_hz`) along with the live waveform array for chart rendering.
+
+- GET /api/v1/events/recent?limit=10
+  Returns the latest timeline logs for the "RECENT EVENTS" component.
+
+- GET /api/v1/network/posture
+  Returns `packet_delivery_pct` (98.7%) and `gateway_latency_ms` (184ms).
+
+- POST /api/v1/simulation/scenario
+  Payload: `{ "scenario": "Normal Operation" | "Increased Vibration" | "Loose Joint" | "Excess Load" }`
+  Updates the background simulation generator state immediately.
+
+- POST /api/v1/system/reset
+  Resets all alert counters, clears active anomalies, and sets system status back to nominal.
+
+### 4. WebSocket Broadcasting Layer
+- Implement WebSockets (`Socket.io` or `ws`).
+- Broadcast `telemetry_stream` events every 1-2 seconds containing latest raw waveform points, spectral features, and status updates.
+- Broadcast `alert_triggered` events immediately when an anomaly score exceeds threshold (> 0.70).
+
+### 5. Frontend Modifications & Wiring Instructions
+- Connect the "LIVE / DEMO" mode toggle to switch backend data sources between `/api/v1/telemetry/ingest` and the simulator.
+- Connect the 4 test scenario buttons ("Normal Operation", "Increased Vibration", "Loose Joint", "Excess Load") to trigger `POST /api/v1/simulation/scenario`.
+- Connect the "RESET SYSTEM" header button to `POST /api/v1/system/reset`.
+- Bind live chart rendering (e.g., Chart.js, Recharts, or Canvas) to the WebSocket `telemetry_stream` payload.
+- Update the bottom pipeline status bar ("SENSING" -> "FEATURE EXTRACTION" -> "TINYML" -> "LORA" -> "GATEWAY") dynamically whenever a new data frame is processed.

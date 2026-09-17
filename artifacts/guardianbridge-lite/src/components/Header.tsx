@@ -2,7 +2,6 @@ import { Bell, Menu, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useDemo } from '@/context/DemoContext';
-import { getAlerts } from '@/data/mockData';
 
 interface HeaderProps {
   onMenu: () => void;
@@ -10,9 +9,8 @@ interface HeaderProps {
 
 export function Header({ onMenu }: HeaderProps) {
   const [location] = useLocation();
-  const { resetSystem, scenario, isDemo } = useDemo();
-  const activeScenario = isDemo ? scenario : 'normal';
-  const activeAlerts = getAlerts(activeScenario).filter((item) => item.severity !== 'NORMAL').length;
+  const { resetSystem, summary, error } = useDemo();
+  const activeAlerts = summary.active_alerts_count;
   const title = location === '/' ? 'Dashboard' : location.startsWith('/bridges') ? 'Bridges' : location === '/live-monitoring' ? 'Live Monitoring' : location === '/tinyml' ? 'TinyML Analysis' : location === '/alerts' ? 'Alert Center' : location === '/lora' ? 'LoRa Network' : 'System';
   const subtitle = location === '/' ? 'Real-time overview of your bridge monitoring network' : 'GuardianBridge Lite engineering console';
   const [noticeOpen, setNoticeOpen] = useState(false);
@@ -31,11 +29,11 @@ export function Header({ onMenu }: HeaderProps) {
       <div className="flex items-center gap-3 md:gap-5">
         <div className="hidden items-center gap-2 sm:flex">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,.5)]" />
-          <span className="text-[10px] font-medium tracking-[0.14em] text-emerald-300">SYSTEM ONLINE</span>
+           <span className={`text-[10px] font-medium tracking-[0.14em] ${error ? 'text-amber-300' : 'text-emerald-300'}`}>{error ? 'API DEGRADED' : 'SYSTEM ONLINE'}</span>
         </div>
         <div className="hidden border-l border-slate-700/70 pl-5 text-right md:block">
           <div className="mono text-[10px] text-slate-400">LAST SYNC</div>
-          <div className="mono mt-0.5 text-[10px] text-slate-600">21:52:14 UTC</div>
+           <div className="mono mt-0.5 text-[10px] text-slate-600">{summary.last_updated === new Date(0).toISOString() ? 'WAITING' : new Date(summary.last_updated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })} UTC</div>
         </div>
         <div className="relative">
           <button aria-label="Notifications" data-testid="button-notifications" onClick={() => { setNoticeOpen((open) => !open); setProfileOpen(false); }} className={`relative rounded border p-2 transition-colors ${noticeOpen ? 'border-cyan-300/50 bg-cyan-300/10 text-cyan-200' : 'border-transparent text-slate-400 hover:border-slate-600 hover:text-slate-200'}`}>
@@ -52,7 +50,7 @@ export function Header({ onMenu }: HeaderProps) {
             </div>
           )}
         </div>
-        <button data-testid="button-reset-system-header" onClick={() => { if (window.confirm('Reset the simulated system to Normal Operation?')) resetSystem(); }} className="hidden border border-amber-300/25 bg-amber-300/[0.05] px-2.5 py-2 text-[9px] font-semibold tracking-[0.12em] text-amber-200 transition-colors hover:border-amber-300/60 hover:bg-amber-300/10 sm:block">RESET SYSTEM</button>
+         <button data-testid="button-reset-system-header" onClick={() => { if (window.confirm('Reset the telemetry system to Normal Operation?')) void resetSystem(); }} className="hidden border border-amber-300/25 bg-amber-300/[0.05] px-2.5 py-2 text-[9px] font-semibold tracking-[0.12em] text-amber-200 transition-colors hover:border-amber-300/60 hover:bg-amber-300/10 sm:block">RESET SYSTEM</button>
         <div className="relative">
           <button aria-label="Open profile" data-testid="button-profile" onClick={() => { setProfileOpen((open) => !open); setNoticeOpen(false); }} className="flex items-center gap-2 rounded border border-slate-700/80 bg-slate-800/40 px-2 py-1.5 text-slate-300 hover:border-cyan-300/40">
             <span className="flex h-6 w-6 items-center justify-center bg-slate-700 text-[10px] font-semibold text-cyan-200">MT</span>

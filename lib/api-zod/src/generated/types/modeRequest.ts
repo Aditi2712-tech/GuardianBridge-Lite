@@ -5,7 +5,8 @@
  * GuardianBridge Lite telemetry and structural health monitoring API
  * OpenAPI spec version: 0.1.0
  */
+import type { ModeRequestMode } from './modeRequestMode';
 
-export interface HealthStatus {
-  status: string;
+export interface ModeRequest {
+  mode: ModeRequestMode;
 }

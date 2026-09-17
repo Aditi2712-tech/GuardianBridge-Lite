@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
-}
+export type ModeRequestMode = typeof ModeRequestMode[keyof typeof ModeRequestMode];
+
+
+export const ModeRequestMode = {
+  LIVE: 'LIVE',
+  DEMO: 'DEMO',
+} as const;

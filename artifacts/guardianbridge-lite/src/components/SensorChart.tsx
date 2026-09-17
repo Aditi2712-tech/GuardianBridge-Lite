@@ -2,12 +2,13 @@ import { Activity } from 'lucide-react';
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useDemo } from '@/context/DemoContext';
-import { getScenarioStats, getWaveform } from '@/data/mockData';
 
 export function SensorChart() {
-  const { scenario, isDemo } = useDemo();
-  const readings = useMemo(() => getWaveform(isDemo ? scenario : 'normal'), [isDemo, scenario]);
-  const stats = getScenarioStats(isDemo ? scenario : 'normal');
+  const { vibration, isDemo } = useDemo();
+  const readings = useMemo(() => vibration.waveform.map((value, index) => ({
+    time: `${String(Math.floor(index / 60)).padStart(2, '0')}:${String(index % 60).padStart(2, '0')}`,
+    value: Number((value + 0.5).toFixed(3)),
+  })), [vibration.waveform]);
   return (
     <section className="panel panel-accent min-w-0 p-5" data-testid="card-live-vibration">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -33,10 +34,10 @@ export function SensorChart() {
       </div>
       <div className="mt-2 grid grid-cols-2 border-t border-slate-700/60 pt-4 sm:grid-cols-4">
         {[
-          ['SAMPLING RATE', stats.sampling],
-          ['RMS', stats.rms],
-          ['PEAK-TO-PEAK', stats.peak],
-          ['FFT PEAK', stats.fft],
+           ['SAMPLING RATE', `${vibration.sampling_rate} Hz`],
+           ['RMS', `${vibration.rms_g.toFixed(2)} g`],
+           ['PEAK-TO-PEAK', `${vibration.peak_to_peak_g.toFixed(2)} g`],
+           ['FFT PEAK', `${vibration.fft_peak_hz.toFixed(1)} Hz`],
         ].map(([label, value]) => (
           <div key={label} className="border-r border-slate-700/60 px-3 first:pl-0 last:border-0">
             <div className="mono text-[8px] tracking-[0.11em] text-slate-500">{label}</div>

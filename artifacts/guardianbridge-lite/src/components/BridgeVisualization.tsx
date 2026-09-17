@@ -6,9 +6,10 @@ import type { SensorNode } from '@/types';
 
 export function BridgeVisualization() {
   const [selectedNode, setSelectedNode] = useState<SensorNode | null>(null);
-  const { scenario, isDemo } = useDemo();
-  const stats = getScenarioStats(isDemo ? scenario : 'normal');
-  const nodes = getScenarioNodes(isDemo ? scenario : 'normal');
+  const { scenario, vibration, summary } = useDemo();
+  const nodes = getScenarioNodes(scenario).map((node, index) => index === 0
+    ? { ...node, vibration: vibration.rms_g, rssi: summary.rssi_dbm, status: summary.tinyml_status === 'CRITICAL' ? 'offline' as const : summary.tinyml_status === 'NORMAL' ? 'online' as const : 'warning' as const }
+    : node);
   const nodesOnline = nodes.filter((node) => node.status === 'online').length;
   return (
     <section className="panel min-w-0 p-5" data-testid="card-bridge-visualization">
@@ -69,8 +70,8 @@ export function BridgeVisualization() {
               {([
                 { label: 'Battery', value: `${selectedNode.battery}%`, icon: BatteryMedium },
                 { label: 'RSSI', value: `${selectedNode.rssi} dBm`, icon: Radio },
-                { label: 'Vibration', value: `${stats.nodeVibration.toFixed(2)} g`, icon: Waves },
-                { label: 'Tilt', value: `${stats.nodeTilt.toFixed(2)}°`, icon: RotateCcw },
+                 { label: 'Vibration', value: `${vibration.rms_g.toFixed(2)} g`, icon: Waves },
+                 { label: 'Tilt', value: `${(vibration.anomaly_score * 3.2).toFixed(2)}°`, icon: RotateCcw },
               ] as { label: string; value: string; icon: typeof BatteryMedium }[]).map(({ label, value, icon: MetricIcon }) => (
                 <div key={label} className="bg-[#152638] p-3"><MetricIcon size={14} className="mb-2 text-cyan-300" /><div className="text-[9px] uppercase tracking-[0.16em] text-slate-500">{label}</div><div className="mono mt-1 text-[13px] text-slate-100" data-testid={`node-${label.toLowerCase()}-${selectedNode.id}`}>{value}</div></div>
               ))}
